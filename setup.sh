@@ -63,8 +63,8 @@ echo "Cloning project from GitHub.."
 echo ""
 echo "============================================================"
 
-su - $USER -c "git clone https://github.com/vincelwt/RaspberryCast.git"
-chmod +x ./RaspberryCast/RaspberryCast.sh
+#su - $USER -c "git clone https://github.com/vincelwt/RaspberryCast.git"
+chmod +x ./RaspberryPi/show.sh
 
 echo ""
 echo "============================================================"
@@ -78,7 +78,7 @@ chmod 666 /dev/tty1
 
 #Add to rc.local startup
 sed -i '$ d' /etc/rc.local
-echo "su - $USER -c \"cd ./RaspberryCast/ && ./RaspberryCast.sh start\"" >> /etc/rc.local
+echo "su - $USER -c \"cd ./RaspberryPi/ && ./show.sh start\"" >> /etc/rc.local
 echo "exit 0" >> /etc/rc.local
 
 #Adding right to current pi user to shutdown
