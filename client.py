@@ -1,8 +1,9 @@
 
 import socket
 import time
+import subprocess
 
-TCP_IP = 'localhost'
+TCP_IP = '192.168.50.34'
 TCP_PORT = 60001
 
 BUFFER_SIZE = 1024
@@ -29,6 +30,10 @@ with open('received_file', 'wb') as f:
 print('Successfully get the file')
 s.close()
 print('connection closed')
+
+bashCommand = "sudo fbi -a -T 1 /home/pi/RaspberryPi/received_file"
+process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+output, error = process.communicate()
 
 clock_end = time.clock()
 time_end = time.time()
