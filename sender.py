@@ -5,7 +5,7 @@ import struct
 from threading import Thread
 from socketserver import ThreadingMixIn
 
-hostname = 'localhost'
+hostname = '192.168.50.142'
 hostport = 30002
 MAXBUFLEN = 1024
 
@@ -23,8 +23,8 @@ class SenderThread(Thread):
 
     def run(self):
 
-        #Path = "/home/pi/Downloads/"
-        Path = "/home/ke/Downloads/"
+        Path = "/home/pi/Downloads/"
+        #Path = "/home/ke/Downloads/"
         filelist = os.listdir(Path)
         count = 0
         for i in filelist:
