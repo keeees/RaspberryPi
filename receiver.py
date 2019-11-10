@@ -4,14 +4,13 @@ import socket
 import subprocess
 
 
-hostname = 'localhost'
-hostport = 30002
+TCP_IP = '192.168.50.142'
+TCP_PORT = 30002
 MAXBUFLEN = 1024
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((hostname,hostport))
-s.listen(2)
-sockfd,addr = s.accept()
+
+sockfd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sockfd.connect((TCP_IP, TCP_PORT))
 
 print('Connection established')
 count = sockfd.recv(MAXBUFLEN)
