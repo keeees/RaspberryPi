@@ -4,6 +4,8 @@ import socket
 import subprocess
 import struct
 
+#each file transmission start with sender sending file size, receiver will get the size of file first.
+#Then receiver will receive all packets and waiting for next packet
 
 TCP_IP = '192.168.50.34' #ip address of sender
 TCP_PORT = 30002
@@ -53,6 +55,6 @@ for i in range(num_files):
 sockfd.close()
 print('Success, connection closed')
 #bashCommand = "sudo fbi -a -T 1 /home/pi/RaspberryPi/received_file"
-bashCommand = "sudo fbi -a -T 1 -t 1 -1 --readahead /home/pi/RaspberryPi/received_file"
+bashCommand = "sudo fbi -a -T 1 -t 1 -1 --readahead /home/pi/RaspberryPi/*.jpg"
 process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
 output, error = process.communicate()
