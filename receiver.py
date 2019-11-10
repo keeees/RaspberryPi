@@ -1,4 +1,5 @@
 import os
+import time
 import sys
 import socket
 import subprocess
@@ -50,11 +51,14 @@ for i in range(num_files):
                 break
             f.write(data)
             file_size -= len(data)
-
+        bashCommand = 'sudo fbi -a -T 1 -t 1 -1  /home/pi/RaspberryPi/received_file_%i.jpg' %i
+        process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+        output, error = process.communicate()
+        time.sleep(1)
 
 sockfd.close()
 print('Success, connection closed')
 #bashCommand = "sudo fbi -a -T 1 /home/pi/RaspberryPi/received_file"
-bashCommand = "sudo fbi -a -T 1 -t 1 -1 --readahead /home/pi/RaspberryPi/*.jpg"
-process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-output, error = process.communicate()
+#bashCommand = "sudo fbi -a -T 1 -t 1 -1  /home/pi/RaspberryPi/*.jpg"
+#process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+#output, error = process.communicate()
