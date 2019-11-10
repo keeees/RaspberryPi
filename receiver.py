@@ -8,26 +8,11 @@ hostname = 'localhost'
 hostport = 30002
 MAXBUFLEN = 1024
 
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind((hostname,hostport))
+s.listen(2)
+sockfd,addr = s.accept()
 
-sockfd = None
-for res in socket.getaddrinfo(hostname, hostport, socket.AF_UNSPEC,
-                              socket.SOCK_STREAM, 0, socket.AI_PASSIVE):
-    af, socktype, proto, canonname, sa = res
-    try:
-        sockfd = socket.socket(af, socktype, proto)
-    except OSError as msg:
-        sockfd = None
-        continue
-    try:
-        sockfd.connect(sa)
-    except OSError as msg:
-        sockfd.close()
-        sockfd = None
-        continue
-    break
-if sockfd is None:
-    print('could not open socket')
-    sys.exit(1)
 print('Connection established')
 count = sockfd.recv(MAXBUFLEN)
 num_files = int.from_bytes(count, byteorder='big')
