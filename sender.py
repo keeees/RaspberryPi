@@ -34,6 +34,12 @@ class SenderThread(Thread):
         self.sock.send(struct.pack("B",count))
         for i in filelist:
             if i.endswith(".jpg"):
+                file_size = os.path.getsize(Path+i)
+                print(file_size)
+                buffer = b''
+                buffer = struct.pack('!I', file_size)
+                print('File size packed into binary format:', buffer)
+                self.sock.sendall(buffer)
                 with open(Path + i, 'rb') as f:
                     while True:
                         l = f.read(MAXBUFLEN)
@@ -42,7 +48,6 @@ class SenderThread(Thread):
                             l = f.read(MAXBUFLEN)
                         if not l:
                             f.close()
-                            self.sock.send(1)
                             break
                         
         self.sock.close()
