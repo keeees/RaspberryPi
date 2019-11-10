@@ -4,7 +4,7 @@ import socket
 import subprocess
 
 
-TCP_IP = '192.168.50.34'
+TCP_IP = '192.168.50.34' #ip address of sender
 TCP_PORT = 30002
 MAXBUFLEN = 1024
 
@@ -28,6 +28,6 @@ for i in range(num_files):
 
 sockfd.close()
 print('Success, connection closed')
-#bashCommand = "sudo fbi -a -T 1 /home/pi/RaspberryPi/received_file"
-#process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-#output, error = process.communicate()
+bashCommand = "sudo fbi -a -T 1 /home/pi/RaspberryPi/received_file"
+process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+output, error = process.communicate()
