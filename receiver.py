@@ -23,11 +23,15 @@ for i in range(num_files):
             if not data:
                 f.close()
                 break
+            if data == 1:
+                f.close()
+                break
             f.write(data)
 
 
 sockfd.close()
 print('Success, connection closed')
-bashCommand = "sudo fbi -a -T 1 /home/pi/RaspberryPi/received_file"
+#bashCommand = "sudo fbi -a -T 1 /home/pi/RaspberryPi/received_file"
+bashCommand = "sudo fbi -a -T 1 -t 1 -1 --readahead /home/pi/RaspberryPi/received_file"
 process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
 output, error = process.communicate()

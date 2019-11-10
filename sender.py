@@ -42,7 +42,9 @@ class SenderThread(Thread):
                             l = f.read(MAXBUFLEN)
                         if not l:
                             f.close()
+                            self.sock.send(1)
                             break
+                        
         self.sock.close()
 
 
