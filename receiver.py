@@ -4,7 +4,7 @@ import socket
 import subprocess
 
 
-TCP_IP = '192.168.50.142'
+TCP_IP = '192.168.50.34'
 TCP_PORT = 30002
 MAXBUFLEN = 1024
 
