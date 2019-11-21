@@ -11,7 +11,7 @@ import struct
 TCP_IP = '192.168.50.34' #ip address of sender
 TCP_PORT = 30002
 MAXBUFLEN = 1024
-
+#size_buff = b''
 def readn(sock, count):
     data = b''
     while len(data) < count:
@@ -19,16 +19,19 @@ def readn(sock, count):
         if packet == '':
             return ''
         data += packet
+    #size_buff = data
     return data
     
 sockfd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sockfd.connect((TCP_IP, TCP_PORT))
-
+time_start = time.clock()
 print('Connection established')
 count = sockfd.recv(MAXBUFLEN)
 num_files = int.from_bytes(count, byteorder='big')
 print('Number of files to be received', int.from_bytes(count, byteorder='big'))
+#time_start = time.clock()
 for i in range(num_files):
+    #while(readn(sockfd,4)!=''):
     size_buff = readn(sockfd, 4)
     if size_buff == '':
         print('Failed to receive file size.', file=sys.stderr)
@@ -38,26 +41,28 @@ for i in range(num_files):
     size_unpacked = struct.unpack('!I', size_buff)
     file_size = size_unpacked[0]
     print('Will receive file of size', file_size, 'bytes.')
-
+        
     with open('received_file_%i.jpg' %i, 'wb') as f:
         BUFFER = MAXBUFLEN
         while file_size > 0:
             if(file_size<BUFFER):
                 BUFFER=file_size
-            data = sockfd.recv(BUFFER)
+            data = sockfd.recv(BUFFER) 
             #print(len(data), 'bytes received.')
             if not data:
                 print('End of  file.',i)
                 break
             f.write(data)
             file_size -= len(data)
-        bashCommand = 'sudo fbi -a -T 1 -t 1 -1  /home/pi/RaspberryPi/received_file_%i.jpg' %i
-        process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-        output, error = process.communicate()
-        time.sleep(1)
+        #bashCommand = 'sudo fbi -a -T 1 -t 1 -1  /home/pi/RaspberryPi/received_file_%i.jpg' %i
+        #process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+        #output, error = process.communicate()
+        #time.sleep(1)
 
 sockfd.close()
+time_end = time.clock()
 print('Success, connection closed')
+print('time duration_time = ',time_end-time_start )
 #bashCommand = "sudo fbi -a -T 1 /home/pi/RaspberryPi/received_file"
 #bashCommand = "sudo fbi -a -T 1 -t 1 -1  /home/pi/RaspberryPi/*.jpg"
 #process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
