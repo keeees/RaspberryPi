@@ -4,10 +4,10 @@
 #       intended for use with rfcomm-server
 #
 # $Id: rfcomm-client.py 424 2006-08-24 03:35:54Z albert $
-
+import time
 from bluetooth import *
 import sys
-
+MAXBUFLEN = 1024
 if sys.version < '3':
     input = raw_input
 
@@ -58,12 +58,14 @@ while True:
             buffer = struct.pack('!I', file_size)
             print('File size packed into binary format:', buffer)
             sock.sendall(buffer)
+            time.sleep(0.5)
             with open(Path + i, 'rb') as f:
                 while True:
                     l = f.read(MAXBUFLEN)
                     while (l):
                         sock.send(l)
                         l = f.read(MAXBUFLEN)
+                        time.sleep(0.5)
                     if not l:
                         f.close()
                         break
