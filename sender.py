@@ -1,4 +1,5 @@
 import sys
+import time 
 import os
 import socket
 import struct
@@ -49,7 +50,7 @@ class SenderThread(Thread):
                         if not l:
                             f.close()
                             break
-                        
+                time.sleep(0.25)        
         self.sock.close()
 
 
