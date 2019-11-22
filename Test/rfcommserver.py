@@ -13,6 +13,7 @@ def readn(sock, count):
     return data
     
 server_sock=BluetoothSocket( RFCOMM )
+#server_sock.setblocking(False)
 server_sock.bind(("",PORT_ANY))
 server_sock.listen(1)
 
@@ -42,7 +43,7 @@ try:
             #while(readn(server_sock,4)!=''):
             size_buff = readn(server_sock, 4)
             if size_buff == '':
-                print('Failed to receive file size.', file=sys.stderr)
+                print('Failed to receive file size.')
                 server_sock.close()
                 sys.exit(3)
 
