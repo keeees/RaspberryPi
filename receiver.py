@@ -6,7 +6,8 @@ import subprocess
 import struct
 import io
 from PIL import Image
-
+import numpy as np
+import cv2
 
 
 TCP_IP = '192.168.50.34' #ip address of sender
@@ -29,11 +30,19 @@ sockfd.connect((TCP_IP, TCP_PORT))
 #time_start = time.clock()
 print('Connection established')
 
-
 f = sockfd.makefile('rwb')
-count = 0
+#count = 0
+
+# Initialize frame rate calculation
+frame_rate_calc = 1
+freq = cv2.getTickFrequency()
+font = cv2.FONT_HERSHEY_SIMPLEX
+cv2.namedWindow('img',cv2.WND_PROP_FULLSCREEN)
+cv2.setWindowProperty('img',cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
 try:
     while True:
+        t1 = cv2.getTickCount()
+
         #waiting for signal from sender
         image_size = struct.unpack('<L',f.read(struct.calcsize('<L')))[0]
  
@@ -46,14 +55,25 @@ try:
         stream = io.BytesIO()
         stream.write(f.read(image_size))
         stream.seek(0)
-        image = Image.open(stream)
-        print('receive image'+str(count))
-        image.save('image%d.jpg'%count)
-        count+=1
-        #bashCommand = 'sudo fbi -a -T 1 -t 1 -1  /home/pi/RaspberryPi/received_file_%i.jpg' %i
-        #process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-        #output, error = process.communicate()
-        #time.sleep(1)
+
+        img = cv2.imdecode(np.fromstring(stream.read(),np.uint8),1)
+        cv2.putText(img,"FPS: {0:.2f}".format(frame_rate_calc),(30,50),font,1,(255,255,0),2,cv2.LINE_AA)
+        
+        cv2.imshow("img",img)
+        
+         
+        t2 = cv2.getTickCount()
+        time1 = (t2-t1)/freq
+        frame_rate_calc = 1/time1
+        if cv2.waitKey(1) == ord('q'):
+            break
+        #save image
+        #image = Image.open(stream)
+        #print('receive image'+str(count))
+        #image.save('image.jpg')
+        #count+=1
+        #image.show()
+        
 except:
     print('Oops!',sys.exc_info()[0],'occured')
     f.close()

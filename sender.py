@@ -64,7 +64,6 @@ class SenderThread(Thread):
                         print('no request received')
                 else:
                     print("images are the same")
-                time.sleep(0.01)
         except:
             print('Oops!',sys.exc_info()[0],'occured')
             f.close()
