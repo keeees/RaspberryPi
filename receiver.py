@@ -4,13 +4,15 @@ import sys
 import socket
 import subprocess
 import struct
+import io
+from PIL import Image
 
-#each file transmission start with sender sending file size, receiver will get the size of file first.
-#Then receiver will receive all packets and waiting for next packet
+
 
 TCP_IP = '192.168.50.34' #ip address of sender
 TCP_PORT = 30002
 MAXBUFLEN = 1024
+ack = 33
 #size_buff = b''
 def readn(sock, count):
     data = b''
@@ -24,45 +26,42 @@ def readn(sock, count):
     
 sockfd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sockfd.connect((TCP_IP, TCP_PORT))
-time_start = time.clock()
-print('Connection established')
-count = sockfd.recv(MAXBUFLEN)
-num_files = int.from_bytes(count, byteorder='big')
-print('Number of files to be received', int.from_bytes(count, byteorder='big'))
 #time_start = time.clock()
-for i in range(num_files):
-    #while(readn(sockfd,4)!=''):
-    size_buff = readn(sockfd, 4)
-    if size_buff == '':
-        print('Failed to receive file size.', file=sys.stderr)
-        sockfd.close()
-        sys.exit(3)
+print('Connection established')
 
-    size_unpacked = struct.unpack('!I', size_buff)
-    file_size = size_unpacked[0]
-    print('Will receive file of size', file_size, 'bytes.')
-        
-    with open('received_file_%i.jpg' %i, 'wb') as f:
-        BUFFER = MAXBUFLEN
-        while file_size > 0:
-            if(file_size<BUFFER):
-                BUFFER=file_size
-            data = sockfd.recv(BUFFER) 
-            #print(len(data), 'bytes received.')
-            if not data:
-                print('End of  file.',i)
-                break
-            f.write(data)
-            file_size -= len(data)
+
+f = sockfd.makefile('rwb')
+count = 0
+try:
+    while True:
+        #waiting for signal from sender
+        image_size = struct.unpack('<L',f.read(struct.calcsize('<L')))[0]
+ 
+         #received signal from sender, send request for the file
+        f.write(struct.pack('<L',ack)) #get size in little endian unsigned long
+
+        f.flush()
+
+        #start receiving file
+        stream = io.BytesIO()
+        stream.write(f.read(image_size))
+        stream.seek(0)
+        image = Image.open(stream)
+        print('receive image'+str(count))
+        image.save('image%d.jpg'%count)
+        count+=1
         #bashCommand = 'sudo fbi -a -T 1 -t 1 -1  /home/pi/RaspberryPi/received_file_%i.jpg' %i
         #process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
         #output, error = process.communicate()
         #time.sleep(1)
-
-sockfd.close()
-time_end = time.clock()
+except:
+    print('Oops!',sys.exc_info()[0],'occured')
+    f.close()
+    sockfd.close()
+#sockfd.close()
+#time_end = time.clock()
 print('Success, connection closed')
-print('time duration_time = ',time_end-time_start )
+#print('time duration_time = ',time_end-time_start )
 #bashCommand = "sudo fbi -a -T 1 /home/pi/RaspberryPi/received_file"
 #bashCommand = "sudo fbi -a -T 1 -t 1 -1  /home/pi/RaspberryPi/*.jpg"
 #process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)

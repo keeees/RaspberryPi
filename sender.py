@@ -1,15 +1,19 @@
 import sys
-import time 
+import time
 import os
 import socket
 import struct
 from threading import Thread
 from socketserver import ThreadingMixIn
+from picamera import PiCamera
+import io
+from PIL import Image
+from PIL import ImageChops
 
 hostname = ''
 hostport = 30002
 MAXBUFLEN = 1024
-
+ack = 33
 
 
 class SenderThread(Thread):
@@ -23,37 +27,48 @@ class SenderThread(Thread):
         print("New thread started")
 
     def run(self):
-
-        Path = "/home/pi/Downloads/"
-        #Path = "/home/ke/Downloads/"
-        filelist = os.listdir(Path)
+        f = self.sock.makefile('rwb')
+        camera = PiCamera()
+        camera.resolution = (1280,720)
+        camera.start_preview()
+        time.sleep(2)
+        camera.stop_preview()
+        camera.capture('foo.jpg')
+        stream = io.BytesIO()
         count = 0
-        for i in filelist:
-            if i.endswith(".jpg"):
-                count+=1
-        print('number of file', count)
-        self.sock.send(struct.pack("B",count))
-        for i in filelist:
-            if i.endswith(".jpg"):
-                file_size = os.path.getsize(Path+i)
-                print(file_size)
-                buffer = b''
-                buffer = struct.pack('!I', file_size)
-                print('File size packed into binary format:', buffer)
-                self.sock.sendall(buffer)
-                with open(Path + i, 'rb') as f:
-                    while True:
-                        l = f.read(MAXBUFLEN)
-                        while (l):
-                            self.sock.send(l)
-                            l = f.read(MAXBUFLEN)
-                        if not l:
-                            f.close()
-                            break
-                time.sleep(0.25)        
-        self.sock.close()
+        print('start sending image')
+        
+        try:
+            
+            for frame in camera.capture_continuous(stream,'jpeg'):
+                #check whether image has changed
+                prev_image = Image.open('foo.jpg')
+                curr_image = Image.open(stream)
+                diff = ImageChops.difference(prev_image,curr_image)
+                if diff.getbbox(): #if images are different, send size of file
+                    print("images are different")
+                    f.write(struct.pack('<L',stream.tell())) #get size in little endian unsigned long
+                    f.flush()
+                    stream.seek(0)
+                    
+                    #waiting for request from receiver
+                    request = f.read(struct.calcsize('<L'))
 
-
+                    if(request == struct.pack('<L',ack)): #get request
+                        f.write(stream.read()) #send simage data
+                        print('sending image ',count)
+                        stream.seek(0)
+                        stream.truncate()
+                        count+=1
+                    else: #no request, do nothing
+                        print('no request received')
+                else:
+                    print("images are the same")
+                time.sleep(0.01)
+        except:
+            print('Oops!',sys.exc_info()[0],'occured')
+            f.close()
+            self.sock.close()
 
 sockfd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sockfd.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
