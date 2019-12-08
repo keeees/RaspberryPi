@@ -67,10 +67,12 @@ try:
         frame_rate_calc = 1/time1
         if cv2.waitKey(1) == ord('q'):
             break
+        status = cv2.imwrite('/home/pi/ibmcloud/image.jpg',img)
+        print(status)
         #save image
         #image = Image.open(stream)
         #print('receive image'+str(count))
-        #image.save('image.jpg')
+        #image.save('~/ibmcloud/image.jpg')
         #count+=1
         #image.show()
         

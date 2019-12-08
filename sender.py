@@ -56,12 +56,15 @@ class SenderThread(Thread):
 
                     if(request == struct.pack('<L',ack)): #get request
                         f.write(stream.read()) #send simage data
+                        curr_image.save('foo.jpg')
                         print('sending image ',count)
                         stream.seek(0)
                         stream.truncate()
                         count+=1
-                    else: #no request, do nothing
-                        print('no request received')
+                        
+                    else: #no request, buffer file
+                        print('no request received, buffer file')
+                        
                 else:
                     print("images are the same")
         except:
