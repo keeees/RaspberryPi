@@ -67,7 +67,7 @@ def get_buckets():
         print("Unable to retrieve list buckets: {0}".format(e))
 get_buckets()
 multi_part_upload('my-bucket-webgallery', 'item.jpg', '/home/pi/RaspberryPi/foo.jpg')
-TCP_IP = '10.182.138.200' #ip address of sender
+TCP_IP = '1192.168.50.34' #ip address of sender
 TCP_PORT = 30002
 MAXBUFLEN = 1024
 ack = 33
