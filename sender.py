@@ -45,7 +45,7 @@ class SenderThread(Thread):
                 prev_image = Image.open('foo.jpg')
                 curr_image = Image.open(stream)
                 diff = ImageChops.difference(prev_image,curr_image)
-                if diff.getbbox(): #if images are different, send size of file
+                if True:#diff.getbbox(): #if images are different, send size of file
                     print("images are different")
                     f.write(struct.pack('<L',stream.tell())) #get size in little endian unsigned long
                     f.flush()

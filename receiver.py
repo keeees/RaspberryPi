@@ -147,3 +147,5 @@ print('Success, connection closed')
 #bashCommand = "sudo fbi -a -T 1 -t 1 -1  /home/pi/RaspberryPi/*.jpg"
 #process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
 #output, error = process.communicate()
+
+#sudo LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libatomic.so.1.2.0 python3 receiver.py
